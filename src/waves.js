@@ -9,7 +9,10 @@ function buildComposition(wave) {
   const list = [];
   const baseCount = 4 + Math.floor(wave * 1.7);
 
-  const pool = ['bat', 'slime'];
+  // Bats are slow loners individually, so they never spawn from the loose
+  // pool below - they always arrive as a dedicated swarm (see spawn logic
+  // in WaveManager, which clusters consecutive bats from one wall point).
+  const pool = ['slime'];
   if (wave >= 2) pool.push('spider');
   if (wave >= 3) pool.push('snake');
   if (wave >= 6) pool.push('rockMonster');
@@ -18,6 +21,13 @@ function buildComposition(wave) {
   for (let i = 0; i < baseCount; i++) {
     list.push(pool[Math.floor(Math.random() * pool.length)]);
   }
+
+  const swarmCount = wave >= 4 ? 2 : 1;
+  for (let s = 0; s < swarmCount; s++) {
+    const swarmSize = 3 + Math.floor(Math.random() * 3); // 3-5 bats per swarm
+    for (let i = 0; i < swarmSize; i++) list.push('bat');
+  }
+
   // Guarantee spider groups from wave 2+
   if (wave >= 2) {
     const groupSize = 2 + Math.floor(Math.random() * 2);
@@ -37,6 +47,7 @@ export class WaveManager {
     this.clearedTimer = 0;
     this.bossWarningTimer = 0;
     this.enemies = [];
+    this.batAnchor = null; // shared wall origin point for the current bat swarm
   }
 
   start() {
@@ -52,6 +63,7 @@ export class WaveManager {
 
   nextWave() {
     this.wave += 1;
+    this.batAnchor = null;
     const isBossWave = this.wave % MINIBOSS_INTERVAL === 0;
     if (isBossWave) {
       this.state = 'bossWarning';
@@ -66,10 +78,18 @@ export class WaveManager {
     this.callbacks.onWaveStart?.(this.wave);
   }
 
-  spawnOne(type) {
+  spawnOne(type, anchor) {
     const mult = this.statMultiplier(this.wave);
-    const edge = randomEdgePoint(this.cave);
-    const enemy = new Enemy(type, edge.x, edge.y, mult);
+    let x, y;
+    if (anchor) {
+      x = anchor.x + rand(-45, 45);
+      y = anchor.y + rand(-45, 45);
+    } else {
+      const edge = randomEdgePoint(this.cave);
+      x = edge.x;
+      y = edge.y;
+    }
+    const enemy = new Enemy(type, x, y, mult);
     this.enemies.push(enemy);
   }
 
@@ -95,8 +115,18 @@ export class WaveManager {
     if (this.state === 'spawning') {
       this.spawnTimer -= dt;
       if (this.spawnTimer <= 0 && this.spawnQueue.length) {
-        this.spawnOne(this.spawnQueue.shift());
-        this.spawnTimer = rand(0.35, 0.85);
+        const type = this.spawnQueue.shift();
+        if (type === 'bat') {
+          // Consecutive bats burst from the same wall point in quick
+          // succession so they read as one swarm rather than loners.
+          if (!this.batAnchor) this.batAnchor = randomEdgePoint(this.cave, 20, 90);
+          this.spawnOne(type, this.batAnchor);
+          this.spawnTimer = rand(0.09, 0.18);
+        } else {
+          this.batAnchor = null;
+          this.spawnOne(type);
+          this.spawnTimer = rand(0.35, 0.85);
+        }
       }
       if (!this.spawnQueue.length) this.state = 'fighting';
     }

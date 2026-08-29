@@ -1,24 +1,40 @@
-import { CAVE_BASE_RADIUS, CAVE_SAFE_ZONE, COLORS } from './constants.js';
+import { CAVE_HALF_WIDTH, CAVE_HALF_HEIGHT, CAVE_SAFE_ZONE, COLORS } from './constants.js';
 import { rand, randInt } from './utils.js';
 
-// Builds an irregular "star shaped" cave boundary around the origin using
-// a handful of randomised sine harmonics. radiusAt(theta) gives the wall
-// distance for any angle, which makes containment / clamping trivial.
-export function makeCaveShape(baseRadius = CAVE_BASE_RADIUS) {
+// Exact distance from the origin to the boundary of an axis-aligned
+// rectangle (half-width x half-height), for a ray at angle theta.
+function rectRadius(theta, halfW, halfH) {
+  const c = Math.cos(theta);
+  const s = Math.sin(theta);
+  const tx = c !== 0 ? halfW / Math.abs(c) : Infinity;
+  const ty = s !== 0 ? halfH / Math.abs(s) : Infinity;
+  return Math.min(tx, ty);
+}
+
+// Builds a rectangular cave boundary around the origin, with a bit of
+// high-frequency jaggedness layered on top so the walls read as rock
+// rather than a perfect box. radiusAt(theta) gives the wall distance for
+// any angle, which is what makes containment / clamping / spawning all
+// work generically for any star-shaped domain (rectangle included).
+export function makeCaveShape(halfW = CAVE_HALF_WIDTH, halfH = CAVE_HALF_HEIGHT) {
   const harmonics = [];
-  const count = randInt(4, 6);
+  const count = randInt(8, 12);
+  const minHalf = Math.min(halfW, halfH);
   for (let i = 0; i < count; i++) {
     harmonics.push({
-      freq: randInt(2, 7),
-      amp: rand(0.05, 0.16) * baseRadius,
+      freq: randInt(9, 18),
+      amp: rand(0.02, 0.045) * minHalf,
       phase: rand(0, Math.PI * 2),
     });
   }
   function radiusAt(theta) {
-    let r = baseRadius;
+    let r = rectRadius(theta, halfW, halfH);
     for (const h of harmonics) r += Math.sin(theta * h.freq + h.phase) * h.amp;
-    return Math.max(r, baseRadius * 0.55);
+    return Math.max(r, minHalf * 0.55);
   }
+  // Diagonal half-length so gradients/backdrops sized off this still
+  // reach the rectangle's corners.
+  const baseRadius = Math.hypot(halfW, halfH);
   return { radiusAt, baseRadius };
 }
 

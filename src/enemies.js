@@ -3,7 +3,7 @@ import { rand, clamp } from './utils.js';
 // Base stats per enemy type. Wave manager scales hp/speed slightly as
 // waves progress (see waves.js) so things stay winnable but tense.
 export const ENEMY_TYPES = {
-  bat: { hp: 1, speed: 230, radius: 13, score: 10, color: '#8a5cf6', contactDamage: 1 },
+  bat: { hp: 1, speed: 135, radius: 13, score: 10, color: '#8a5cf6', contactDamage: 1 },
   spider: { hp: 3, speed: 95, radius: 18, score: 20, color: '#5a3d2b', contactDamage: 1 },
   slime: { hp: 2, speed: 65, radius: 16, score: 15, color: '#4ade80', contactDamage: 1 },
   rockMonster: { hp: 8, speed: 42, radius: 24, score: 40, color: '#8a8a8a', contactDamage: 1 },
