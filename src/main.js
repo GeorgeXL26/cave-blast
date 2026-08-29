@@ -152,14 +152,18 @@ function updateWeaponHud() {
   const icons = {
     pistol: '🔫',
     doublePistols: '🔫🔫',
+    quadPistols: '🔫🔫🔫🔫',
     rifle: '🪖',
+    bazooka: '🚀',
     poweredRifle: '🔥',
     ultimate: '💫',
   };
   const names = {
     pistol: 'PISTOL',
     doublePistols: 'DOUBLE PISTOLS',
+    quadPistols: 'QUADRUPLE PISTOLS',
     rifle: 'RIFLE',
+    bazooka: 'BAZOOKA',
     poweredRifle: 'POWERED RIFLE',
     ultimate: 'ULTIMATE WEAPON',
   };
@@ -199,8 +203,25 @@ function registerKill(enemy) {
 
 function weightedBossDrop() {
   // Mini-boss always drops something exciting
-  const table = ['ultimate', 'poweredRifle', 'rifle', 'doublePistols', 'power', 'magnet'];
+  const table = ['ultimate', 'poweredRifle', 'bazooka', 'rifle', 'doublePistols', 'power', 'magnet'];
   return table[Math.floor(Math.random() * table.length)];
+}
+
+// Explosive splash damage for weapons like the bazooka. Hits every live
+// enemy within `radius` of (x,y) except the one already hit directly.
+function explode(x, y, radius, damage, primaryEnemy) {
+  audio.explosion();
+  game.particles.burst(x, y, '#ff8a3d', 20, { speed: 260, life: 0.5 });
+  game.particles.burst(x, y, '#ffe066', 14, { speed: 180, life: 0.4 });
+  shakeTime = Math.max(shakeTime, 0.2);
+  shakeMag = Math.max(shakeMag, 5);
+  for (const e of game.waveManager.enemies) {
+    if (e.dead || e === primaryEnemy) continue;
+    if (dist(x, y, e.x, e.y) < radius + e.radius) {
+      const killed = e.hit(damage);
+      if (killed) registerKill(e);
+    }
+  }
 }
 
 // ---------- Main update ----------
@@ -232,6 +253,7 @@ function update(dt) {
         game.particles.spark(proj.x, proj.y, proj.vx, proj.vy, e.color);
         const killed = e.hit(proj.damage);
         if (killed) registerKill(e);
+        if (proj.splashRadius > 0) explode(proj.x, proj.y, proj.splashRadius, proj.splashDamage, e);
         break;
       }
     }

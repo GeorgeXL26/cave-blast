@@ -200,11 +200,31 @@ export class Player {
       ctx.fillRect(10, 3, 20, 5);
       ctx.fillRect(22, -8, 5, 8);
       ctx.fillRect(22, 3, 5, 8);
+    } else if (weapon === 'quadPistols') {
+      ctx.fillRect(10, -14, 18, 4.5);
+      ctx.fillRect(10, -6, 18, 4.5);
+      ctx.fillRect(10, 2, 18, 4.5);
+      ctx.fillRect(10, 10, 18, 4.5);
+      ctx.fillRect(21, -14, 5, 7);
+      ctx.fillRect(21, -6, 5, 7);
+      ctx.fillRect(21, 2, 5, 7);
+      ctx.fillRect(21, 10, 5, 7);
     } else if (weapon === 'rifle') {
       ctx.fillStyle = '#6a7a8f';
       ctx.fillRect(8, -3, 40, 6);
       ctx.fillStyle = '#3a3a40';
       ctx.fillRect(4, -6, 12, 12);
+    } else if (weapon === 'bazooka') {
+      ctx.fillStyle = '#3a3a40';
+      ctx.fillRect(4, -9, 48, 18);
+      ctx.fillStyle = '#ff8a3d';
+      ctx.fillRect(4, -9, 9, 18);
+      ctx.fillStyle = '#1f1f24';
+      ctx.beginPath();
+      ctx.arc(54, 0, 6.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#6a6a72';
+      ctx.fillRect(14, 9, 8, 12);
     } else if (weapon === 'poweredRifle') {
       ctx.fillStyle = '#ff9b54';
       ctx.fillRect(8, -4, 42, 8);

@@ -25,6 +25,18 @@ export const WEAPONS = {
     spread: 0.14,
     color: '#ffe066',
   },
+  quadPistols: {
+    key: 'quadPistols',
+    name: 'QUADRUPLE PISTOLS',
+    icon: '🔫🔫🔫🔫',
+    cooldown: 0.34,
+    damage: 1,
+    speed: 780,
+    range: 520,
+    count: 4,
+    spread: 0.32,
+    color: '#ffe066',
+  },
   rifle: {
     key: 'rifle',
     name: 'RIFLE',
@@ -36,6 +48,21 @@ export const WEAPONS = {
     count: 1,
     spread: 0.02,
     color: '#9be8ff',
+  },
+  bazooka: {
+    key: 'bazooka',
+    name: 'BAZOOKA',
+    icon: '🚀',
+    cooldown: 0.85,
+    damage: 4,
+    speed: 560,
+    range: 750,
+    count: 1,
+    spread: 0,
+    color: '#ff8a3d',
+    projRadius: 9,
+    splashRadius: 95,
+    splashDamage: 2,
   },
   poweredRifle: {
     key: 'poweredRifle',
@@ -73,9 +100,11 @@ export class Projectile {
     this.damage = weapon.damage + damageBonus;
     this.range = weapon.range;
     this.traveled = 0;
-    this.radius = 5;
+    this.radius = weapon.projRadius || 5;
     this.color = weapon.color;
     this.dead = false;
+    this.splashRadius = weapon.splashRadius || 0;
+    this.splashDamage = this.splashRadius > 0 ? (weapon.splashDamage || 0) + damageBonus : 0;
   }
 
   update(dt) {
@@ -95,13 +124,29 @@ export class Projectile {
     ctx.rotate(this.angle);
     ctx.fillStyle = this.color;
     ctx.beginPath();
-    ctx.ellipse(0, 0, 9, 3.5, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, 0, this.radius * 1.8, this.radius * 0.7, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.globalAlpha = 0.5;
     ctx.beginPath();
-    ctx.ellipse(-6, 0, 6, 2, 0, 0, Math.PI * 2);
+    ctx.ellipse(-this.radius * 1.2, 0, this.radius * 1.2, this.radius * 0.4, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.globalAlpha = 1;
+    if (this.splashRadius > 0) {
+      // rocket fins
+      ctx.fillStyle = '#8a8a92';
+      ctx.beginPath();
+      ctx.moveTo(-this.radius * 1.6, 0);
+      ctx.lineTo(-this.radius * 2.4, -this.radius * 0.9);
+      ctx.lineTo(-this.radius * 1.6, -this.radius * 0.3);
+      ctx.closePath();
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(-this.radius * 1.6, 0);
+      ctx.lineTo(-this.radius * 2.4, this.radius * 0.9);
+      ctx.lineTo(-this.radius * 1.6, this.radius * 0.3);
+      ctx.closePath();
+      ctx.fill();
+    }
     ctx.restore();
   }
 }

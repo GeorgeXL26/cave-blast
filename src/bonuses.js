@@ -11,6 +11,7 @@ import { dist } from './utils.js';
 export const BONUS_DEFS = {
   doublePistols: { icon: '🔫', label: '🔫 DOUBLE PISTOLS!', color: '#ffe066', kind: 'weapon' },
   rifle: { icon: '🪖', label: '🔥 RIFLE UNLOCKED!', color: '#9be8ff', kind: 'weapon' },
+  bazooka: { icon: '🚀', label: '🚀 BAZOOKA UNLOCKED!', color: '#ff8a3d', kind: 'weapon' },
   poweredRifle: { icon: '🔥', label: '🔥 POWERED RIFLE!', color: '#ff9b54', kind: 'weapon' },
   ultimate: { icon: '💫', label: '💫 ULTIMATE WEAPON!', color: '#ff6bd6', kind: 'weapon' },
   rapidFire: { icon: '💥', label: '💥 RAPID FIRE!', color: '#ff4d4d', kind: 'buff' },
@@ -25,6 +26,7 @@ function dropTable(wave) {
   return [
     { type: 'doublePistols', weight: 14 },
     { type: 'rifle', weight: 14 },
+    { type: 'bazooka', weight: wave >= 3 ? 12 : 3 },
     { type: 'poweredRifle', weight: wave >= 5 ? 10 : 2 },
     { type: 'ultimate', weight: wave >= 8 ? 8 : 1 },
     { type: 'rapidFire', weight: 16 },
@@ -105,8 +107,21 @@ export function applyBonus(type, player, game) {
   const def = BONUS_DEFS[type];
   const now = performance.now() / 1000;
   switch (type) {
-    case 'doublePistols':
+    case 'doublePistols': {
+      // Stepping on a second double-pistols bonus while already dual-wielding
+      // stacks up to quadruple pistols instead of just re-granting the same gun.
+      if (player.weapon === 'doublePistols') {
+        player.setWeapon('quadPistols');
+        return { label: '🔫 QUADRUPLE PISTOLS!', isWeapon: true };
+      }
+      if (player.weapon === 'quadPistols') {
+        return null; // already maxed out on pistols, no downgrade
+      }
+      player.setWeapon('doublePistols');
+      return { label: def.label, isWeapon: true };
+    }
     case 'rifle':
+    case 'bazooka':
     case 'poweredRifle':
     case 'ultimate':
       player.setWeapon(type);
