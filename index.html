@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>🐷 Piggy Cave Blast</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐷</text></svg>" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <canvas id="game-canvas"></canvas>
+
+    <!-- HUD (visible only during gameplay) -->
+    <div id="hud" class="hidden">
+      <div id="hud-health" class="hud hud-topleft"></div>
+      <div id="hud-wave" class="hud hud-topcenter">WAVE 1</div>
+      <div id="hud-score" class="hud hud-topright">SCORE: 0</div>
+      <div id="hud-boss-wrap" class="hud hud-bosswrap hidden">
+        <div id="hud-boss-label">GIANT CAVE BEAST</div>
+        <div id="hud-boss-bar-bg"><div id="hud-boss-bar"></div></div>
+      </div>
+      <div id="hud-weapon" class="hud hud-bottomleft">
+        <span id="weapon-icon">🔫</span>
+        <span id="weapon-name">PISTOL</span>
+      </div>
+      <div id="hud-kills" class="hud hud-bottomright">KILLS: 0</div>
+
+      <div id="banner-wave-cleared" class="banner hidden">WAVE CLEARED!</div>
+      <div id="banner-weapon" class="banner banner-weapon hidden"></div>
+      <div id="banner-boss" class="banner banner-boss hidden">⚠️ GIANT CAVE BEAST INCOMING! ⚠️</div>
+      <div id="banner-combo" class="banner-combo hidden"></div>
+    </div>
+
+    <!-- Main menu -->
+    <div id="screen-menu" class="screen">
+      <div class="panel">
+        <h1>🐷 PIGGY CAVE BLAST</h1>
+        <p class="subtitle">A tiny piggy. A big cave. Way too many monsters.</p>
+        <button id="btn-play" class="btn btn-primary">PLAY</button>
+        <button id="btn-howto" class="btn">HOW TO PLAY</button>
+        <button id="btn-settings" class="btn">SETTINGS</button>
+      </div>
+    </div>
+
+    <!-- How to play -->
+    <div id="screen-howto" class="screen hidden">
+      <div class="panel">
+        <h2>HOW TO PLAY</h2>
+        <ul class="howto-list">
+          <li>⬆️⬇️⬅️➡️ <b>Arrow keys</b> — move your piggy around the cave</li>
+          <li>🖱️ <b>Mouse</b> — aim your weapon</li>
+          <li>🖱️ <b>Click / hold</b> — shoot</li>
+          <li>👾 Defeat cave creatures for points and combos</li>
+          <li>⭐ Collect glowing bonuses dropped by enemies</li>
+          <li>🔫 Find weapon upgrades to get stronger</li>
+          <li>❤️ Don't let your health reach zero!</li>
+          <li>🌊 Survive as many waves as you can — mini-bosses show up every 5 waves</li>
+        </ul>
+        <button class="btn btn-primary btn-back" data-back="menu">BACK</button>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div id="screen-settings" class="screen hidden">
+      <div class="panel">
+        <h2>SETTINGS</h2>
+        <label class="settings-row">
+          <span>Sound</span>
+          <input type="checkbox" id="chk-sound" checked />
+        </label>
+        <button class="btn btn-primary btn-back" data-back="menu">BACK</button>
+      </div>
+    </div>
+
+    <!-- Game over -->
+    <div id="screen-gameover" class="screen hidden">
+      <div class="panel">
+        <h1 class="gameover-title">GAME OVER</h1>
+        <p id="final-score" class="final-score"></p>
+        <p id="final-wave" class="final-wave"></p>
+        <button id="btn-again" class="btn btn-primary">PLAY AGAIN</button>
+        <button id="btn-mainmenu" class="btn">MAIN MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
