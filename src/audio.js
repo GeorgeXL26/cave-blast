@@ -71,7 +71,7 @@ class AudioEngine {
     if (weaponKey === 'bazooka') {
       this.tone(160, 0.22, { type: 'sawtooth', gain: 0.22, slideTo: 70 });
       this.noiseBurst(0.15, { gain: 0.14, filterFreq: 1400 });
-    } else if (weaponKey === 'rifle' || weaponKey === 'poweredRifle' || weaponKey === 'ultimate') {
+    } else if (weaponKey === 'rifle' || weaponKey === 'dualRifles' || weaponKey === 'poweredRifle' || weaponKey === 'ultimate') {
       this.tone(520, 0.08, { type: 'sawtooth', gain: 0.15, slideTo: 220 });
     } else {
       this.tone(340, 0.09, { type: 'square', gain: 0.16, slideTo: 140 });

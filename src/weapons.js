@@ -49,6 +49,18 @@ export const WEAPONS = {
     spread: 0.02,
     color: '#9be8ff',
   },
+  dualRifles: {
+    key: 'dualRifles',
+    name: 'DUAL RIFLES',
+    icon: '🪖🪖',
+    cooldown: 0.16,
+    damage: 1,
+    speed: 1050,
+    range: 900,
+    count: 2,
+    spread: 0.11,
+    color: '#9be8ff',
+  },
   bazooka: {
     key: 'bazooka',
     name: 'BAZOOKA',

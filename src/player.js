@@ -214,6 +214,13 @@ export class Player {
       ctx.fillRect(8, -3, 40, 6);
       ctx.fillStyle = '#3a3a40';
       ctx.fillRect(4, -6, 12, 12);
+    } else if (weapon === 'dualRifles') {
+      ctx.fillStyle = '#6a7a8f';
+      ctx.fillRect(8, -10, 38, 5.5);
+      ctx.fillRect(8, 4.5, 38, 5.5);
+      ctx.fillStyle = '#3a3a40';
+      ctx.fillRect(4, -12, 11, 11);
+      ctx.fillRect(4, 1, 11, 11);
     } else if (weapon === 'bazooka') {
       ctx.fillStyle = '#3a3a40';
       ctx.fillRect(4, -9, 48, 18);

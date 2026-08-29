@@ -108,8 +108,16 @@ export function applyBonus(type, player, game) {
   const now = performance.now() / 1000;
   switch (type) {
     case 'doublePistols': {
-      // Stepping on a second double-pistols bonus while already dual-wielding
-      // stacks up to quadruple pistols instead of just re-granting the same gun.
+      // Combo upgrades: a second double-pistols bonus fuses with whatever
+      // weapon is currently equipped instead of just re-granting the same gun.
+      if (player.weapon === 'dualRifles') {
+        player.setWeapon('bazooka');
+        return { label: '🚀 BAZOOKA!', isWeapon: true };
+      }
+      if (player.weapon === 'rifle') {
+        player.setWeapon('dualRifles');
+        return { label: '🪖🪖 DUAL RIFLES!', isWeapon: true };
+      }
       if (player.weapon === 'doublePistols') {
         player.setWeapon('quadPistols');
         return { label: '🔫 QUADRUPLE PISTOLS!', isWeapon: true };
