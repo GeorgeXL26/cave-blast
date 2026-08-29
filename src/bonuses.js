@@ -110,6 +110,13 @@ export function applyBonus(type, player, game) {
     case 'doublePistols': {
       // Combo upgrades: a second double-pistols bonus fuses with whatever
       // weapon is currently equipped instead of just re-granting the same gun.
+      if (player.weapon === 'bazooka') {
+        player.setWeapon('doubleBazooka');
+        return { label: '🚀🚀 DOUBLE BAZOOKA!', isWeapon: true };
+      }
+      if (player.weapon === 'doubleBazooka') {
+        return null; // already maxed out on rockets, no downgrade
+      }
       if (player.weapon === 'dualRifles') {
         player.setWeapon('bazooka');
         return { label: '🚀 BAZOOKA!', isWeapon: true };

@@ -156,6 +156,7 @@ function updateWeaponHud() {
     rifle: '🪖',
     dualRifles: '🪖🪖',
     bazooka: '🚀',
+    doubleBazooka: '🚀🚀',
     poweredRifle: '🔥',
     ultimate: '💫',
   };
@@ -166,6 +167,7 @@ function updateWeaponHud() {
     rifle: 'RIFLE',
     dualRifles: 'DUAL RIFLES',
     bazooka: 'BAZOOKA',
+    doubleBazooka: 'DOUBLE BAZOOKA',
     poweredRifle: 'POWERED RIFLE',
     ultimate: 'ULTIMATE WEAPON',
   };

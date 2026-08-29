@@ -232,6 +232,18 @@ export class Player {
       ctx.fill();
       ctx.fillStyle = '#6a6a72';
       ctx.fillRect(14, 9, 8, 12);
+    } else if (weapon === 'doubleBazooka') {
+      ctx.fillStyle = '#3a3a40';
+      ctx.fillRect(4, -15, 46, 13);
+      ctx.fillRect(4, 2, 46, 13);
+      ctx.fillStyle = '#ff8a3d';
+      ctx.fillRect(4, -15, 8, 13);
+      ctx.fillRect(4, 2, 8, 13);
+      ctx.fillStyle = '#1f1f24';
+      ctx.beginPath();
+      ctx.arc(52, -8.5, 5.5, 0, Math.PI * 2);
+      ctx.arc(52, 8.5, 5.5, 0, Math.PI * 2);
+      ctx.fill();
     } else if (weapon === 'poweredRifle') {
       ctx.fillStyle = '#ff9b54';
       ctx.fillRect(8, -4, 42, 8);
