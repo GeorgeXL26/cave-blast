@@ -10,11 +10,7 @@ export class Input {
 
     window.addEventListener('keydown', (e) => {
       this.keys.add(e.code);
-      if (
-        ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(
-          e.code
-        )
-      ) {
+      if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'Space'].includes(e.code)) {
         e.preventDefault();
       }
     });
@@ -37,10 +33,10 @@ export class Input {
   moveVector() {
     let x = 0;
     let y = 0;
-    if (this.keys.has('ArrowUp')) y -= 1;
-    if (this.keys.has('ArrowDown')) y += 1;
-    if (this.keys.has('ArrowLeft')) x -= 1;
-    if (this.keys.has('ArrowRight')) x += 1;
+    if (this.keys.has('KeyW')) y -= 1;
+    if (this.keys.has('KeyS')) y += 1;
+    if (this.keys.has('KeyA')) x -= 1;
+    if (this.keys.has('KeyD')) x += 1;
     if (x !== 0 && y !== 0) {
       const inv = 1 / Math.sqrt(2);
       x *= inv;

@@ -11,7 +11,7 @@ primitives and all sound is synthesized live with the Web Audio API.
 
 ## Controls
 
-- **Arrow keys** — move
+- **WASD** — move
 - **Mouse** — aim
 - **Click / hold left mouse button** — shoot
 
