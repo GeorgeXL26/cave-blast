@@ -2,8 +2,9 @@
 
 A fast, funny, chaotic 2D top-down arcade survival shooter. You are a tiny
 pink piggy trapped in a cave, armed with a pistol, fighting off endless
-waves of bats, spiders, slimes, rock monsters, snakes, ghosts, arrow
-shooters, chainsaw shooters, and the occasional giant cave beast mini-boss
+waves of bats, spiders, slimes, rock monsters, snakes, ghosts, caterpillars
+(burn + root you on touch), arrow shooters, chainsaw shooters, and the
+occasional giant cave beast mini-boss
 — who shoots arrows at range and, once enraged, rolls in for a fast charge
 you have to dodge. Defeated enemies can drop coins and weapon bonuses.
 

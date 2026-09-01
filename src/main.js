@@ -321,6 +321,7 @@ function update(dt) {
         audio.playerHit();
         shakeTime = Math.max(shakeTime, 0.25);
         shakeMag = Math.max(shakeMag, 6);
+        if (e.rootDuration) p.rootedUntil = performance.now() / 1000 + e.rootDuration;
         updateHealthHud();
         if (p.health <= 0) {
           endGame();

@@ -16,6 +16,7 @@ function buildComposition(wave) {
   if (wave >= 2) pool.push('spider');
   if (wave >= 3) pool.push('snake');
   if (wave >= 4) pool.push('arrowShooter');
+  if (wave >= 4) pool.push('caterpillar');
   if (wave >= 5) pool.push('chainsawShooter');
   if (wave >= 6) pool.push('rockMonster');
   if (wave >= 6) pool.push('ghost');
@@ -49,7 +50,8 @@ export class WaveManager {
     this.clearedTimer = 0;
     this.bossWarningTimer = 0;
     this.enemies = [];
-    this.batAnchor = null; // shared wall origin point for the current bat swarm
+    this.batAnchor = null; // shared wall origin point for the current bat column
+    this.batColumnIndex = 0; // position of the next bat within that column
   }
 
   start() {
@@ -66,6 +68,7 @@ export class WaveManager {
   nextWave() {
     this.wave += 1;
     this.batAnchor = null;
+    this.batColumnIndex = 0;
     const isBossWave = this.wave % MINIBOSS_INTERVAL === 0;
     if (isBossWave) {
       this.state = 'bossWarning';
@@ -80,12 +83,12 @@ export class WaveManager {
     this.callbacks.onWaveStart?.(this.wave);
   }
 
-  spawnOne(type, anchor) {
+  spawnOne(type, pos) {
     const mult = this.statMultiplier(this.wave);
     let x, y;
-    if (anchor) {
-      x = anchor.x + rand(-45, 45);
-      y = anchor.y + rand(-45, 45);
+    if (pos) {
+      x = pos.x;
+      y = pos.y;
     } else {
       const edge = randomEdgePoint(this.cave);
       x = edge.x;
@@ -119,10 +122,20 @@ export class WaveManager {
       if (this.spawnTimer <= 0 && this.spawnQueue.length) {
         const type = this.spawnQueue.shift();
         if (type === 'bat') {
-          // Consecutive bats burst from the same wall point in quick
-          // succession so they read as one swarm rather than loners.
-          if (!this.batAnchor) this.batAnchor = randomEdgePoint(this.cave, 20, 90);
-          this.spawnOne(type, this.batAnchor);
+          // Consecutive bats line up in a single-file column (not a
+          // scattered pack): same wall point, evenly spaced along one
+          // straight line, spawned in quick succession.
+          if (!this.batAnchor) {
+            this.batAnchor = randomEdgePoint(this.cave, 20, 90);
+            this.batColumnIndex = 0;
+          }
+          const spacing = 40;
+          const pos = {
+            x: this.batAnchor.x,
+            y: this.batAnchor.y + (this.batColumnIndex - 2) * spacing,
+          };
+          this.spawnOne(type, pos);
+          this.batColumnIndex += 1;
           this.spawnTimer = rand(0.09, 0.18);
         } else {
           this.batAnchor = null;

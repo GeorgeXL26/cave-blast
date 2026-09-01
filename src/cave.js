@@ -18,12 +18,12 @@ function rectRadius(theta, halfW, halfH) {
 // work generically for any star-shaped domain (rectangle included).
 export function makeCaveShape(halfW = CAVE_HALF_WIDTH, halfH = CAVE_HALF_HEIGHT) {
   const harmonics = [];
-  const count = randInt(8, 12);
+  const count = randInt(6, 9);
   const minHalf = Math.min(halfW, halfH);
   for (let i = 0; i < count; i++) {
     harmonics.push({
-      freq: randInt(9, 18),
-      amp: rand(0.02, 0.045) * minHalf,
+      freq: randInt(7, 13),
+      amp: rand(0.012, 0.026) * minHalf,
       phase: rand(0, Math.PI * 2),
     });
   }

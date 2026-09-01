@@ -1,9 +1,10 @@
 // Global tunable constants for Piggy Cave Blast
 
-// The cave is a (jagged-edged) rectangle centered on the origin.
-// Half-height < half-width makes it noticeably shorter than it is wide.
+// The cave is a (lightly jagged) rectangle centered on the origin.
+// Half-height << half-width keeps it short enough that the top wall is
+// reachable/visible during normal play, not just a wide horizon.
 export const CAVE_HALF_WIDTH = 1450;
-export const CAVE_HALF_HEIGHT = 800;
+export const CAVE_HALF_HEIGHT = 600;
 export const CAVE_SAFE_ZONE = 200; // radius around spawn kept clear of decorations
 export const PLAYER_RADIUS = 20;
 export const PLAYER_SPEED = 280; // px/s

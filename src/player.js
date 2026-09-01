@@ -28,10 +28,15 @@ export class Player {
     this.rapidFireUntil = 0;
     this.powerUntil = 0;
     this.magnetUntil = 0;
+    this.rootedUntil = 0; // caterpillar burn: can't move until this passes
   }
 
   get isInvulnerable() {
     return performance.now() / 1000 < this.invulnUntil;
+  }
+
+  get isRooted() {
+    return performance.now() / 1000 < this.rootedUntil;
   }
 
   get magnetActive() {
@@ -60,7 +65,7 @@ export class Player {
   }
 
   update(dt, input, cave, mouseWorld) {
-    const move = input.moveVector();
+    const move = this.isRooted ? { x: 0, y: 0 } : input.moveVector();
     let nx = this.x + move.x * PLAYER_SPEED * dt;
     let ny = this.y + move.y * PLAYER_SPEED * dt;
     const clamped = clampToCave(nx, ny, cave, this.radius);
@@ -103,6 +108,17 @@ export class Player {
     ctx.beginPath();
     ctx.ellipse(0, this.radius * 0.8, this.radius * 0.9, this.radius * 0.35, 0, 0, Math.PI * 2);
     ctx.fill();
+
+    if (this.isRooted) {
+      const pulse = 0.5 + Math.sin(performance.now() / 90) * 0.5;
+      ctx.save();
+      ctx.strokeStyle = `rgba(255,140,50,${0.6 + pulse * 0.3})`;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.ellipse(0, this.radius * 0.8, this.radius * 1.05, this.radius * 0.4, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
 
     // weapon (drawn behind or in front depending on aim direction)
     const facingRight = Math.cos(this.aimAngle) >= 0;

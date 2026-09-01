@@ -11,6 +11,18 @@ export const ENEMY_TYPES = {
   rockMonster: { hp: 8, speed: 42, radius: 24, score: 40, color: '#8a8a8a', contactDamage: 1 },
   snake: { hp: 3, speed: 165, radius: 13, score: 25, color: '#a3d900', contactDamage: 1 },
   ghost: { hp: 2, speed: 105, radius: 17, score: 50, color: '#d7d9ff', contactDamage: 1 },
+  // Slow but nasty: its touch burns for 1 heart and roots the piggy in
+  // place for a moment (see rootDuration, handled in main.js's contact
+  // damage check and Player.update()'s movement freeze).
+  caterpillar: {
+    hp: 4,
+    speed: 48,
+    radius: 15,
+    score: 30,
+    color: '#ff8a3d',
+    contactDamage: 1,
+    rootDuration: 1.1,
+  },
   arrowShooter: {
     hp: 3,
     speed: 72,
@@ -83,6 +95,7 @@ export class Enemy {
     this.score = def.score;
     this.color = def.color;
     this.contactDamage = def.contactDamage;
+    this.rootDuration = def.rootDuration || 0;
     this.flashUntil = 0;
     this.dead = false;
     this.phase = rand(0, Math.PI * 2);
@@ -426,6 +439,38 @@ export class Enemy {
         ctx.beginPath();
         ctx.arc(-5, -4, 2, 0, Math.PI * 2);
         ctx.arc(5, -4, 2, 0, Math.PI * 2);
+        ctx.fill();
+        break;
+      }
+      case 'caterpillar': {
+        // segmented body trailing behind the head, each ring a slightly
+        // different ember shade so it reads as "burning"
+        const segColors = ['#ffb15c', '#ff8a3d', '#ff6b1a', '#e0501a'];
+        const segments = 4;
+        for (let i = segments - 1; i >= 0; i--) {
+          const wob = Math.sin(this.phase * 1.4 - i * 0.7) * 2.5;
+          const sx = -i * this.radius * 0.9;
+          const sy = wob;
+          const sr = this.radius * (1 - i * 0.12);
+          ctx.fillStyle = i === 0 && flashing ? bodyColor : segColors[i];
+          ctx.beginPath();
+          ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        // tiny fire flecks drifting off the lead segment
+        for (let i = 0; i < 3; i++) {
+          const a = this.phase * 2 + i * 2.1;
+          ctx.globalAlpha = 0.6;
+          ctx.fillStyle = '#ffd27a';
+          ctx.beginPath();
+          ctx.arc(Math.cos(a) * this.radius * 0.6, -this.radius * 0.8 + Math.sin(a) * 3, 2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+        ctx.fillStyle = '#2b1a10';
+        ctx.beginPath();
+        ctx.arc(4, -2, 1.8, 0, Math.PI * 2);
+        ctx.arc(4, 4, 1.8, 0, Math.PI * 2);
         ctx.fill();
         break;
       }
