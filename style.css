@@ -82,6 +82,16 @@ html, body {
   border-radius: 12px;
 }
 
+.hud-coins {
+  top: 62px;
+  right: 18px;
+  font-size: 17px;
+  color: #ffd54a;
+  background: rgba(0,0,0,0.32);
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
 .hud-bosswrap {
   top: 60px;
   left: 50%;

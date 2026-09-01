@@ -2,8 +2,10 @@
 
 A fast, funny, chaotic 2D top-down arcade survival shooter. You are a tiny
 pink piggy trapped in a cave, armed with a pistol, fighting off endless
-waves of bats, spiders, slimes, rock monsters, snakes, ghosts and the
-occasional giant cave beast mini-boss.
+waves of bats, spiders, slimes, rock monsters, snakes, ghosts, arrow
+shooters, chainsaw shooters, and the occasional giant cave beast mini-boss
+— who shoots arrows at range and, once enraged, rolls in for a fast charge
+you have to dodge. Defeated enemies can drop coins and weapon bonuses.
 
 Built with plain HTML5 Canvas + vanilla JavaScript (ES modules) — no build
 step, no external assets, no dependencies. All art is drawn with Canvas
@@ -46,10 +48,12 @@ src/
   cave.js                    Procedural cave boundary, floor & decorations
   player.js                   The piggy: movement, weapon, drawing
   weapons.js                   Weapon definitions + projectiles
-  enemies.js                    Enemy types, AI, drawing
+  enemies.js                    Enemy types, AI (incl. mini-boss charge), drawing
+  enemyProjectiles.js            Arrows/chainsaws fired at the piggy
   waves.js                       Wave/spawn director, mini-boss cadence
   bonuses.js                      Bonus drops, pickup, effects
-  particles.js                     Cartoon particle bursts/sparkles
+  coins.js                         Coin drops, pickup, magnet pull
+  particles.js                      Cartoon particle bursts/sparkles
 ```
 
 ## Deploying to GitHub Pages

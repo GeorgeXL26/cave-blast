@@ -92,6 +92,29 @@ class AudioEngine {
     this.tone(180, 0.18, { type: 'sawtooth', gain: 0.22, slideTo: 60 });
   }
 
+  enemyShoot(kind) {
+    if (kind === 'chainsaw') {
+      this.tone(220, 0.12, { type: 'sawtooth', gain: 0.14, slideTo: 160 });
+      this.noiseBurst(0.1, { gain: 0.08, filterFreq: 2500 });
+    } else {
+      this.tone(700, 0.06, { type: 'triangle', gain: 0.12, slideTo: 380 });
+    }
+  }
+
+  bossChargeWarn() {
+    this.tone(200, 0.5, { type: 'sawtooth', gain: 0.2, slideTo: 500 });
+  }
+
+  bossCharge() {
+    this.tone(80, 0.3, { type: 'sawtooth', gain: 0.25, slideTo: 50 });
+    this.noiseBurst(0.3, { gain: 0.18, filterFreq: 600 });
+  }
+
+  coin() {
+    this.tone(880, 0.05, { type: 'sine', gain: 0.15 });
+    this.tone(1200, 0.06, { type: 'sine', gain: 0.12, delay: 0.04 });
+  }
+
   bonusCollect() {
     this.tone(660, 0.08, { type: 'sine', gain: 0.2 });
     this.tone(990, 0.12, { type: 'sine', gain: 0.18, delay: 0.07 });

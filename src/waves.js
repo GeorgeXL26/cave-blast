@@ -15,6 +15,8 @@ function buildComposition(wave) {
   const pool = ['slime'];
   if (wave >= 2) pool.push('spider');
   if (wave >= 3) pool.push('snake');
+  if (wave >= 4) pool.push('arrowShooter');
+  if (wave >= 5) pool.push('chainsawShooter');
   if (wave >= 6) pool.push('rockMonster');
   if (wave >= 6) pool.push('ghost');
 

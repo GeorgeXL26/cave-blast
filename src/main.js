@@ -4,6 +4,7 @@ import { Player } from './player.js';
 import { makeCaveShape, generateDecorations, drawCave } from './cave.js';
 import { WaveManager } from './waves.js';
 import { Bonus, rollBonusType, applyBonus, checkBonusPickup, BONUS_DEFS } from './bonuses.js';
+import { Coin, checkCoinPickup } from './coins.js';
 import { ParticleSystem } from './particles.js';
 import { COMBO_WINDOW, COMBO_CAP } from './constants.js';
 import { dist, fmtScore, clamp } from './utils.js';
@@ -40,6 +41,7 @@ const elScore = document.getElementById('hud-score');
 const elWeaponIcon = document.getElementById('weapon-icon');
 const elWeaponName = document.getElementById('weapon-name');
 const elKills = document.getElementById('hud-kills');
+const elCoins = document.getElementById('hud-coins');
 const elBossWrap = document.getElementById('hud-boss-wrap');
 const elBossBar = document.getElementById('hud-boss-bar');
 const bannerWaveCleared = document.getElementById('banner-wave-cleared');
@@ -79,7 +81,9 @@ function newGame() {
   const player = new Player();
   const particles = new ParticleSystem();
   const projectiles = [];
+  const enemyProjectiles = [];
   const bonuses = [];
+  const coins = [];
 
   const waveManager = new WaveManager(cave, {
     onWaveStart: (w) => {
@@ -104,10 +108,13 @@ function newGame() {
     player,
     particles,
     projectiles,
+    enemyProjectiles,
     bonuses,
+    coins,
     waveManager,
     score: 0,
     kills: 0,
+    coinsCollected: 0,
     comboCount: 0,
     comboExpire: 0,
     camera: { x: 0, y: 0 },
@@ -123,6 +130,7 @@ function startGame() {
   showScreen(null);
   elScore.textContent = 'SCORE: 0';
   elKills.textContent = 'KILLS: 0';
+  elCoins.textContent = '🪙 0';
   elWave.textContent = 'WAVE 1';
   elBossWrap.classList.add('hidden');
   updateHealthHud();
@@ -203,6 +211,17 @@ function registerKill(enemy) {
     const type = enemy.type === 'miniBoss' ? weightedBossDrop() : rollBonusType(game.waveManager.wave);
     game.bonuses.push(new Bonus(enemy.x, enemy.y, type));
   }
+
+  // coin drop: a separate roll from the weapon/buff bonus above, so a kill
+  // might yield neither, either, or both
+  const coinChance = enemy.type === 'miniBoss' ? 1 : 0.5;
+  if (Math.random() < coinChance) {
+    const value =
+      enemy.type === 'miniBoss' ? 15 + Math.floor(Math.random() * 11) : clamp(Math.round(enemy.score / 12), 1, 5);
+    const jx = (Math.random() - 0.5) * 20;
+    const jy = (Math.random() - 0.5) * 20;
+    game.coins.push(new Coin(enemy.x + jx, enemy.y + jy, value));
+  }
 }
 
 function weightedBossDrop() {
@@ -246,6 +265,35 @@ function update(dt) {
   // wave manager + enemies
   game.waveManager.update(dt);
   for (const e of game.waveManager.enemies) e.update(dt, p);
+  for (const e of game.waveManager.enemies) {
+    if (e.ranged) {
+      const before = game.enemyProjectiles.length;
+      e.tryAttack(dt, p, game.enemyProjectiles);
+      if (game.enemyProjectiles.length > before) audio.enemyShoot(e.projKind);
+    }
+  }
+
+  // enemy projectiles (arrows, chainsaws) vs player
+  for (const ep of game.enemyProjectiles) ep.update(dt);
+  for (const ep of game.enemyProjectiles) {
+    if (ep.dead) continue;
+    if (dist(ep.x, ep.y, p.x, p.y) < ep.radius + p.radius * 0.7) {
+      ep.dead = true;
+      game.particles.spark(ep.x, ep.y, ep.vx, ep.vy, '#ff6b6b');
+      const hit = p.takeDamage(ep.damage);
+      if (hit) {
+        audio.playerHit();
+        shakeTime = Math.max(shakeTime, 0.2);
+        shakeMag = Math.max(shakeMag, 5);
+        updateHealthHud();
+        if (p.health <= 0) {
+          endGame();
+          return;
+        }
+      }
+    }
+  }
+  game.enemyProjectiles = game.enemyProjectiles.filter((ep) => !ep.dead);
 
   // projectile vs enemy collisions
   for (const proj of game.projectiles) {
@@ -302,13 +350,40 @@ function update(dt) {
   }
   game.bonuses = game.bonuses.filter((b) => !b.collected && !b.expired);
 
+  // coins
+  for (const c of game.coins) c.update(dt, p);
+  checkCoinPickup(p, game.coins);
+  for (const c of game.coins) {
+    if (c.collected) {
+      game.coinsCollected += c.value;
+      audio.coin();
+      game.particles.sparkle(c.x, c.y, '#ffd54a');
+      elCoins.textContent = `🪙 ${game.coinsCollected}`;
+    }
+  }
+  game.coins = game.coins.filter((c) => !c.collected && !c.expired);
+
   game.particles.update(dt);
 
-  // boss hud
+  // boss hud + "roll" charge attack cues (telegraph warning, charge impact
+  // shake/trail) driven off state transitions the boss reports on itself
   const boss = game.waveManager.enemies.find((e) => e.type === 'miniBoss');
   if (boss) {
     elBossWrap.classList.remove('hidden');
     elBossBar.style.width = `${clamp((boss.hp / boss.maxHp) * 100, 0, 100)}%`;
+    if (boss.chargeState !== boss._prevChargeState) {
+      if (boss.chargeState === 'telegraph') {
+        audio.bossChargeWarn();
+      } else if (boss.chargeState === 'charging') {
+        audio.bossCharge();
+        shakeTime = Math.max(shakeTime, 0.35);
+        shakeMag = Math.max(shakeMag, 9);
+      }
+      boss._prevChargeState = boss.chargeState;
+    }
+    if (boss.chargeState === 'charging') {
+      game.particles.spark(boss.x, boss.y, -boss.chargeDirX * 220, -boss.chargeDirY * 220, '#ff8a5c');
+    }
   } else {
     elBossWrap.classList.add('hidden');
   }
@@ -339,12 +414,14 @@ function render() {
   drawCave(ctx, game.cave, game.decor, cam, viewW, viewH);
 
   for (const b of game.bonuses) b.draw(ctx, cam);
+  for (const c of game.coins) c.draw(ctx, cam);
   game.particles.draw(ctx, cam);
 
   const drawables = [...game.waveManager.enemies, game.player].sort((a, b) => a.y - b.y);
   for (const d of drawables) d.draw(ctx, cam);
 
   for (const proj of game.projectiles) proj.draw(ctx, cam);
+  for (const ep of game.enemyProjectiles) ep.draw(ctx, cam);
 
   // mouse crosshair
   ctx.save();
