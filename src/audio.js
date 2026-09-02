@@ -92,6 +92,11 @@ class AudioEngine {
     this.tone(180, 0.18, { type: 'sawtooth', gain: 0.22, slideTo: 60 });
   }
 
+  deflect() {
+    this.tone(1000, 0.05, { type: 'square', gain: 0.16 });
+    this.tone(1400, 0.05, { type: 'square', gain: 0.12, delay: 0.02 });
+  }
+
   enemyShoot(kind) {
     if (kind === 'chainsaw') {
       this.tone(220, 0.12, { type: 'sawtooth', gain: 0.14, slideTo: 160 });

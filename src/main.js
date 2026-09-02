@@ -275,6 +275,26 @@ function update(dt) {
 
   // enemy projectiles (arrows, chainsaws) vs player
   for (const ep of game.enemyProjectiles) ep.update(dt);
+
+  // shooting an incoming arrow/chainsaw cancels both it and your shot out
+  for (const proj of game.projectiles) {
+    if (proj.dead) continue;
+    for (const ep of game.enemyProjectiles) {
+      if (ep.dead) continue;
+      if (dist(proj.x, proj.y, ep.x, ep.y) < proj.radius + ep.radius) {
+        proj.dead = true;
+        ep.dead = true;
+        audio.deflect();
+        game.particles.burst((proj.x + ep.x) / 2, (proj.y + ep.y) / 2, '#ffe066', 10, {
+          speed: 200,
+          life: 0.35,
+        });
+        break;
+      }
+    }
+  }
+  game.projectiles = game.projectiles.filter((pr) => !pr.dead);
+
   for (const ep of game.enemyProjectiles) {
     if (ep.dead) continue;
     if (dist(ep.x, ep.y, p.x, p.y) < ep.radius + p.radius * 0.7) {
