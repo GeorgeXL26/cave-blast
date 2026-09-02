@@ -35,6 +35,23 @@ export function dist(x1, y1, x2, y2) {
   return Math.hypot(x2 - x1, y2 - y1);
 }
 
+// Swept collision check for two fast-moving small objects (e.g. two
+// projectiles, or a projectile and a small enemy). A plain end-of-frame
+// distance check can miss objects that tunnel past each other within a
+// single frame; this samples several points along each object's motion
+// this frame (prev -> current) and checks distance at each sample.
+export function sweptHit(ax0, ay0, ax1, ay1, bx0, by0, bx1, by1, rangeSum, steps = 4) {
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const ax = ax0 + (ax1 - ax0) * t;
+    const ay = ay0 + (ay1 - ay0) * t;
+    const bx = bx0 + (bx1 - bx0) * t;
+    const by = by0 + (by1 - by0) * t;
+    if (Math.hypot(ax - bx, ay - by) < rangeSum) return true;
+  }
+  return false;
+}
+
 export function distSq(x1, y1, x2, y2) {
   const dx = x2 - x1;
   const dy = y2 - y1;

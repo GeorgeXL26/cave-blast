@@ -121,6 +121,8 @@ export class Projectile {
   constructor(x, y, angle, weapon, damageBonus) {
     this.x = x;
     this.y = y;
+    this.prevX = x;
+    this.prevY = y;
     this.vx = Math.cos(angle) * weapon.speed;
     this.vy = Math.sin(angle) * weapon.speed;
     this.angle = angle;
@@ -135,6 +137,8 @@ export class Projectile {
   }
 
   update(dt) {
+    this.prevX = this.x;
+    this.prevY = this.y;
     const dx = this.vx * dt;
     const dy = this.vy * dt;
     this.x += dx;

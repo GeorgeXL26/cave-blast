@@ -12,14 +12,10 @@ function buildComposition(wave) {
   // Bats are slow loners individually, so they never spawn from the loose
   // pool below - they always arrive as a dedicated swarm (see spawn logic
   // in WaveManager, which clusters consecutive bats from one wall point).
-  const pool = ['slime'];
-  if (wave >= 2) pool.push('spider');
-  if (wave >= 3) pool.push('snake');
-  if (wave >= 4) pool.push('arrowShooter');
-  if (wave >= 4) pool.push('caterpillar');
-  if (wave >= 5) pool.push('chainsawShooter');
-  if (wave >= 6) pool.push('rockMonster');
-  if (wave >= 6) pool.push('ghost');
+  // Every other enemy type is in the mix from wave 1 onward; the ramp in
+  // difficulty comes from baseCount growing and statMultiplier() scaling
+  // hp/speed with wave, not from gating which monsters can appear.
+  const pool = ['slime', 'spider', 'snake', 'arrowShooter', 'caterpillar', 'chainsawShooter', 'rockMonster', 'ghost'];
 
   for (let i = 0; i < baseCount; i++) {
     list.push(pool[Math.floor(Math.random() * pool.length)]);
@@ -31,11 +27,9 @@ function buildComposition(wave) {
     for (let i = 0; i < swarmSize; i++) list.push('bat');
   }
 
-  // Guarantee spider groups from wave 2+
-  if (wave >= 2) {
-    const groupSize = 2 + Math.floor(Math.random() * 2);
-    for (let i = 0; i < groupSize; i++) list.push('spider');
-  }
+  // Spiders always show up in a guaranteed group on top of the pool
+  const groupSize = 2 + Math.floor(Math.random() * 2);
+  for (let i = 0; i < groupSize; i++) list.push('spider');
   return list;
 }
 

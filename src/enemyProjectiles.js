@@ -15,6 +15,8 @@ export class EnemyProjectile {
     } = opts;
     this.x = x;
     this.y = y;
+    this.prevX = x;
+    this.prevY = y;
     this.angle = angle;
     this.vx = Math.cos(angle) * speed;
     this.vy = Math.sin(angle) * speed;
@@ -29,6 +31,8 @@ export class EnemyProjectile {
   }
 
   update(dt) {
+    this.prevX = this.x;
+    this.prevY = this.y;
     const dx = this.vx * dt;
     const dy = this.vy * dt;
     this.x += dx;

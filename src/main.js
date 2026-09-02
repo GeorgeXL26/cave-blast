@@ -7,7 +7,7 @@ import { Bonus, rollBonusType, applyBonus, checkBonusPickup, BONUS_DEFS } from '
 import { Coin, checkCoinPickup } from './coins.js';
 import { ParticleSystem } from './particles.js';
 import { COMBO_WINDOW, COMBO_CAP } from './constants.js';
-import { dist, fmtScore, clamp } from './utils.js';
+import { dist, fmtScore, clamp, sweptHit } from './utils.js';
 
 // ---------- Canvas setup ----------
 const canvas = document.getElementById('game-canvas');
@@ -276,12 +276,15 @@ function update(dt) {
   // enemy projectiles (arrows, chainsaws) vs player
   for (const ep of game.enemyProjectiles) ep.update(dt);
 
-  // shooting an incoming arrow/chainsaw cancels both it and your shot out
+  // shooting an incoming arrow/chainsaw cancels both it and your shot out.
+  // Swept check: fast small projectiles can otherwise tunnel past each
+  // other between frames without ever landing within radius at a single
+  // frame boundary.
   for (const proj of game.projectiles) {
     if (proj.dead) continue;
     for (const ep of game.enemyProjectiles) {
       if (ep.dead) continue;
-      if (dist(proj.x, proj.y, ep.x, ep.y) < proj.radius + ep.radius) {
+      if (sweptHit(proj.prevX, proj.prevY, proj.x, proj.y, ep.prevX, ep.prevY, ep.x, ep.y, proj.radius + ep.radius)) {
         proj.dead = true;
         ep.dead = true;
         audio.deflect();
@@ -320,7 +323,7 @@ function update(dt) {
     if (proj.dead) continue;
     for (const e of game.waveManager.enemies) {
       if (e.dead) continue;
-      if (dist(proj.x, proj.y, e.x, e.y) < e.radius + proj.radius) {
+      if (sweptHit(proj.prevX, proj.prevY, proj.x, proj.y, e.x, e.y, e.x, e.y, e.radius + proj.radius)) {
         proj.dead = true;
         game.particles.spark(proj.x, proj.y, proj.vx, proj.vy, e.color);
         const killed = e.hit(proj.damage);
